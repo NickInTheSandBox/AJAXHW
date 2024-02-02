@@ -1,0 +1,63 @@
+﻿<select id="CitySelect"></select>
+<select id="SiteSelect"></select>
+<select id="RoadSelect"></select>
+@* <select id="ImgSelect"></select> *@
+@* <img src="@Url.Content('')"></img> *@
+@section Scripts
+{
+    <script>
+        const selCity = document.querySelector('#CitySelect');
+        const selSite = document.querySelector('#SiteSelect');
+        const selRoad = document.querySelector('#RoadSelect');
+        // const selImg = document.querySelector('#ImgSelect');
+
+        (async () => {
+                const response = await fetch('@Url.Content("~/api/cities")')
+                // const IdSelect = await fetch('@Url.Content("~/api/imgId")')
+            if (!response.ok) {
+                console.log(`有錯誤：${response.status}`)
+                return
+            }
+            // if (!IdSelect.ok) {
+            //     console.log(`有錯誤：${response.status}`)
+            //     return
+            // }
+         const datas = await response.json()   
+         // const ids = await IdSelect.json()
+         const cities = datas.map(city => {
+                        return (`<option value="${city}">${city}</option>`)
+                    })
+                    selCity.innerHTML = cities.join("");
+
+            LoadSites();
+            // const memid = datas.map(member => {
+            //     return (`<option value="${member}">${member}</option>`)
+            // })
+            // selImg.innerHTML = memid.join("");
+})();
+        const LoadSites = async () => {
+            const cityselect = selCity.options[selCity.selectedIndex].value;
+            const response = await fetch(`@Url.Content("~/api/Sites")`+`?city=${cityselect}`) 
+            const datas = await response.json();
+            const sites = datas.map(site => {
+                return (`<option value="${site}">${site}</option>`)
+            })
+            selSite.innerHTML = sites.join("");
+            LoadRoads();
+        }
+        const LoadRoads = async () => {
+            const siteselect = selSite.options[selSite.selectedIndex].value;
+            const response = await fetch(`@Url.Content("~/api/Roads")` + `?site=${siteselect}`)
+            const datas = await response.json();
+            const roads = datas.map(road => {
+                return (`<option value="${road}">${road}</option>`)
+            })
+            selRoad.innerHTML = roads.join("");
+        }
+
+        selCity.addEventListener('change', LoadSites);
+        selSite.addEventListener('change', LoadRoads);
+
+        
+</script>
+}
